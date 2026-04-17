@@ -18,7 +18,12 @@ var host = new HostBuilder()
     })
     .ConfigureServices((context, services) =>
     {
-        services.Configure<PostgresOptions>(context.Configuration.GetSection(PostgresOptions.SectionName));
+        services
+            .AddOptions<PostgresOptions>()
+            .Bind(context.Configuration.GetSection(PostgresOptions.SectionName))
+            .ValidateDataAnnotations()
+            .Validate(options => !string.IsNullOrWhiteSpace(options.ConnectionString), "Postgres:ConnectionString must be configured.")
+            .ValidateOnStart();
 
         services.AddScoped<IDbConnectionFactory, NpgsqlConnectionFactory>();
         services.AddScoped<ICustomerRepository, CustomerRepository>();

@@ -1,0 +1,16 @@
+{
+  "name": "azure-functions-postgresql-template",
+  "image": "mcr.microsoft.com/devcontainers/dotnet:1-8.0-bookworm",
+  "postCreateCommand": "dotnet restore",
+  "forwardPorts": [7071, 5432, 10000],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-azuretools.vscode-azurefunctions",
+        "ms-dotnettools.csharp",
+        "EditorConfig.EditorConfig",
+        "GitHub.vscode-github-actions"
+      ]
+    }
+  }
+}

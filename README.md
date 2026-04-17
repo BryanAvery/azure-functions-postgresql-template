@@ -1,79 +1,110 @@
-# Azure Function App - Engineering Standards Starter
+# C# Azure Functions + PostgreSQL Template
 
-This repository contains an Azure Function App built in C# with PostgreSQL.
+Production-ready starter template for building **.NET 8 Azure Functions (isolated worker)** services backed by **PostgreSQL**.
 
-The goal of this repo is to keep the solution simple, secure, maintainable, and easy to support in production.
+This repository is intentionally structured to be reusable as a GitHub template for internal services.
 
-## Core working rules
+## What this template gives you
 
-- Keep Azure Functions thin
-- Put business logic in services, not trigger handlers
-- Use dependency injection throughout
-- Use structured logging
-- Parameterise all SQL
-- Version control all database changes
-- Never commit secrets
-- Require pull request review
-- Keep tests aligned with code changes
-- Document config, database, and operational impacts
+- Azure Functions isolated worker app with DI-first composition
+- PostgreSQL data access with Dapper and parameterized SQL
+- Unit and integration test projects
+- Baseline architecture, naming, and response conventions docs
+- GitHub Actions CI, CodeQL, dependency review, and Dependabot config
+- Governance files for open-source/compliance readiness
+- Template customization guide and post-template checklist
 
-## Architecture and standards docs
+## Repository structure
 
-- Engineering standards: `docs/architecture/standards.md`
-- Dependency rules: `docs/architecture/dependency-rules.md`
-- Response conventions: `docs/architecture/response-conventions.md`
-- Naming conventions: `docs/architecture/naming-conventions.md`
-- ADRs: `docs/architecture/adr/`
-- Observability baseline: `docs/operations/observability.md`
-- Security baseline: `docs/security/security-baseline.md`
-- Developer onboarding: `docs/development/onboarding.md`
+```text
+src/FunctionApp/                  # Function app source
+tests/UnitTests/                  # Fast, isolated tests
+tests/IntegrationTests/           # DB connectivity/integration tests
+database/migrations/              # SQL migrations (version controlled)
+database/scripts/                 # Operational SQL scripts
+docs/                             # Engineering, security, and onboarding docs
+.github/                          # CI workflows, templates, automations
+.devcontainer/                    # Optional reproducible dev environment
+```
 
-## Technology expectations
+## Getting started (new developer)
 
-- .NET LTS
-- Azure Functions isolated worker model
-- PostgreSQL with Dapper
-- Nullable reference types enabled
-- Central NuGet package management
-- Build and test validation in GitHub Actions
-- Security scanning via CodeQL
+### 1) Prerequisites
 
-## Sample capabilities in this starter
+- .NET SDK 8.x
+- Azure Functions Core Tools v4
+- Docker Desktop (recommended for local PostgreSQL + Azurite)
 
-- HTTP GET endpoint: `GET /customers/{customerId}`
-- HTTP POST endpoint: `POST /customers`
-- Request validation in the service layer
-- Standard success and problem response contracts
-- Database connection abstraction via `IDbConnectionFactory`
-- Queue trigger example: `CustomerSyncQueue`
+### 2) Bootstrap local settings
 
-## Local development quick start
+```bash
+cp src/FunctionApp/local.settings.sample.json src/FunctionApp/local.settings.json
+```
 
-1. Copy `src/FunctionApp/local.settings.sample.json` to `src/FunctionApp/local.settings.json`.
-2. Set connection strings and local values.
-3. Run:
+Update placeholder values in `src/FunctionApp/local.settings.json`.
+
+### 3) Start local dependencies (optional but recommended)
+
+```bash
+docker compose up -d
+```
+
+This starts:
+
+- PostgreSQL on `localhost:5432`
+- Azurite storage emulator on `localhost:10000`
+
+### 4) Build, test, and run
 
 ```bash
 dotnet restore
 dotnet build --configuration Release
-dotnet test tests/UnitTests/UnitTests.csproj --configuration Release
+dotnet test --configuration Release
+func start --csharp --script-root src/FunctionApp/bin/Debug/net8.0
 ```
 
-For full setup details, see `docs/development/onboarding.md`.
+## Required template customization
 
-## CI quality gates
+Before using this as a real service, complete:
 
-The `build.yml` workflow separates:
+1. `docs/template-customization.md`
+2. `docs/template-checklist.md`
 
-- build
-- unit tests + coverage artifact
-- integration tests + coverage artifact
+Replace all `[REPLACE_ME_*]` placeholders.
 
-This keeps feedback focused and allows teams to tune branch protection per job.
+## Configuration
 
-## Security
+Use environment variables / Function values only. Never commit secrets.
 
-- Never commit secrets, passwords, tokens, or connection strings
-- Use Azure Key Vault or pipeline-managed secrets
-- Use least privilege access to Azure and PostgreSQL
-- Do not log secrets or sensitive personal data
+Key settings:
+
+- `Postgres__ConnectionString`
+- `AzureWebJobsStorage`
+- `FUNCTIONS_WORKER_RUNTIME` (`dotnet-isolated`)
+
+See safe examples in:
+
+- `src/FunctionApp/local.settings.sample.json`
+- `.env.sample`
+
+## Quality gates
+
+Pull requests run:
+
+- restore/build/test
+- formatting verification (`dotnet format --verify-no-changes`)
+- dependency vulnerability checks (Dependabot + dependency review)
+- CodeQL static analysis
+
+## Security expectations
+
+- No secrets in git history
+- Parameterized SQL only
+- Least privilege DB and cloud identities
+- Structured logging without sensitive payloads
+
+See `SECURITY.md` and `docs/security/security-baseline.md`.
+
+## License
+
+This template is licensed under the MIT License. Update the copyright holder in `LICENSE`.

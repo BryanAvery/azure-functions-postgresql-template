@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Restore
+        run: dotnet restore
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+      - name: Unit tests
+        run: dotnet test tests/UnitTests/UnitTests.csproj --configuration Release --no-build --collect:"XPlat Code Coverage"
+      - name: Integration tests (opt-in)
+        env:
+          INTEGRATION_TEST_POSTGRES_CONNECTION_STRING: ${{ secrets.INTEGRATION_TEST_POSTGRES_CONNECTION_STRING }}
+        run: dotnet test tests/IntegrationTests/IntegrationTests.csproj --configuration Release --no-build --collect:"XPlat Code Coverage"
+      - name: Format check
+        run: dotnet format --verify-no-changes
+
+  dependency-review:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/dependency-review-action@v4
