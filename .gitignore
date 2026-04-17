@@ -1,0 +1,42 @@
+# Build output
+bin/
+obj/
+artifacts/
+TestResults/
+coverage/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# IDE
+.vs/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+
+# Azure Functions local secrets
+local.settings.json
+src/FunctionApp/local.settings.json
+
+# Environment files
+.env
+.env.*
+!.env.sample
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# NuGet
+*.nupkg
+.nuget/packages/
+
+# Dev containers
+.devcontainer/.env

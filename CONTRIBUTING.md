@@ -1,78 +1,65 @@
 # Contributing
 
-## Branching
+Thanks for contributing.
 
-Create short-lived branches from `main`.
+## Development flow
 
-Use clear branch names such as:
+1. Create a short-lived branch from `main`.
+2. Make focused changes (one concern per pull request).
+3. Run local checks before pushing.
+4. Open a pull request using the template.
 
-- `feature/add-customer-search`
-- `bugfix/fix-null-reference-on-order-save`
-- `hotfix/handle-duplicate-callback`
+## Branch naming
 
-## Pull requests
+Use one of the following patterns:
 
-All changes must be submitted through a pull request.
+- `feature/<short-description>`
+- `fix/<short-description>`
+- `chore/<short-description>`
+- `docs/<short-description>`
 
-Each pull request must include:
+## Local quality checks
 
-- a clear summary of the change
-- why the change is needed
-- test evidence
-- notes on configuration changes
-- notes on database changes if relevant
-- any deployment or support considerations
+Run these commands from repo root:
 
-## Coding expectations
+```bash
+dotnet restore
+dotnet build --configuration Release
+dotnet test --configuration Release
+dotnet format --verify-no-changes
+```
 
-Contributors must follow the standards in `docs/architecture/standards.md`.
+If integration tests are required:
 
-This includes expectations for:
+```bash
+INTEGRATION_TEST_POSTGRES_CONNECTION_STRING="Host=localhost;Port=5432;Database=appdb;Username=app;Password=app" \
+  dotnet test tests/IntegrationTests/IntegrationTests.csproj --configuration Release
+```
 
-- Azure Function design
-- C# coding practices
-- PostgreSQL access
-- security
-- logging
-- testing
-- documentation
+## Pull request expectations
+
+Every PR should include:
+
+- clear summary and motivation
+- test evidence (commands + outcomes)
+- documentation updates where needed
+- notes on migration/configuration/operational impact
+
+## Standards
+
+Contributors must follow:
+
+- `docs/architecture/standards.md`
+- `docs/architecture/dependency-rules.md`
+- `docs/security/security-baseline.md`
 
 ## Definition of done
 
-A change is only complete when:
+A change is done when:
 
-- code has been reviewed
-- checks have passed
-- tests have passed
-- documentation is updated where needed
-- database changes are included where needed
-- configuration impacts are documented
-- operational impacts are understood
-
-## Database changes
-
-All schema changes must be version controlled and reviewed through pull requests.
-
-Manual database updates outside the deployment process are not allowed unless explicitly approved and documented.
-
-## Secrets
-
-Never commit:
-
-- passwords
-- API keys
-- tokens
-- certificates
-- connection strings
-- local settings containing secrets
-
-## Quality expectations
-
-Please keep changes focused and readable.
-
-Avoid:
-
-- large unrelated PRs
-- mixed refactoring and feature changes without explanation
-- hidden breaking changes
-- untested business logic changes
+- code review is complete
+- CI passes
+- tests are updated and passing
+- docs are updated
+- migrations/config changes are included and explained
+- no secrets are committed

@@ -2,26 +2,57 @@
 
 ## Prerequisites
 
-- .NET 8 SDK
+- .NET SDK 8.x
 - Azure Functions Core Tools v4
-- Docker (optional, for integration dependencies)
-- PostgreSQL access for local/integration testing
+- Docker Desktop (recommended)
 
-## First-run setup
+## Quick start
 
-1. Copy `src/FunctionApp/local.settings.sample.json` to `src/FunctionApp/local.settings.json`.
-2. Update local values (especially `Postgres__ConnectionString`).
-3. Restore dependencies: `dotnet restore`.
-4. Build solution: `dotnet build --configuration Release`.
-5. Run unit tests: `dotnet test tests/UnitTests/UnitTests.csproj --configuration Release`.
-6. Run integration tests (optional):
-   `INTEGRATION_TEST_POSTGRES_CONNECTION_STRING=... dotnet test tests/IntegrationTests/IntegrationTests.csproj --configuration Release`.
+1. Create local settings:
 
-## Run function app locally
+   ```bash
+   ./scripts/bootstrap-local.sh
+   ```
 
-`func start --csharp --script-root src/FunctionApp/bin/Debug/net8.0`
+2. Start local dependencies:
+
+   ```bash
+   docker compose up -d
+   ```
+
+3. Build and test:
+
+   ```bash
+   dotnet restore
+   dotnet build --configuration Release
+   dotnet test --configuration Release
+   dotnet format --verify-no-changes
+   ```
+
+4. Run the function app:
+
+   ```bash
+   func start --csharp --script-root src/FunctionApp/bin/Debug/net8.0
+   ```
+
+## Local configuration guidance
+
+Update `src/FunctionApp/local.settings.json` values:
+
+- `AzureWebJobsStorage` should point to Azurite locally (`UseDevelopmentStorage=true`)
+- `Postgres__ConnectionString` should use your local PostgreSQL credentials
+
+## Integration tests
+
+Integration tests run only when `INTEGRATION_TEST_POSTGRES_CONNECTION_STRING` is set.
+
+```bash
+INTEGRATION_TEST_POSTGRES_CONNECTION_STRING="Host=localhost;Port=5432;Database=appdb;Username=app;Password=app" \
+  dotnet test tests/IntegrationTests/IntegrationTests.csproj --configuration Release
+```
 
 ## Troubleshooting
 
-- If startup fails with connection errors, verify PostgreSQL host, SSL mode, and credentials.
-- If queue triggers fail locally, validate `AzureWebJobsStorage` setting.
+- Connection failure: verify local containers are healthy (`docker compose ps`).
+- Functions startup failure: verify `Postgres__ConnectionString` is configured.
+- Queue trigger issues: verify `AzureWebJobsStorage` and Azurite availability.
