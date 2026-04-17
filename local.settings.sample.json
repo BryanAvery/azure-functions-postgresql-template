@@ -1,0 +1,9 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "Postgres__ConnectionString": "Host=localhost;Port=5432;Database=appdb;Username=app;Password=localdev",
+    "ApplicationInsights__ConnectionString": "InstrumentationKey=00000000-0000-0000-0000-000000000000"
+  }
+}
